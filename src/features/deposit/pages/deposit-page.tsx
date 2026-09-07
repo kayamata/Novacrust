@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Wallet, Banknote } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/shared/components/layout";
@@ -36,13 +36,19 @@ const NETWORKS_BY_ASSET: Record<string, CryptoNetwork[]> = {
 
 export function DepositPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { assets, depositCrypto } = useAppStore();
 
   const [mode, setMode] = React.useState<Mode>("choose");
   const [step, setStep] = React.useState<Step>("address");
 
+  // Pre-select from query param if provided.
+  const currencyParam = searchParams.get("currency");
+  const initialAsset = currencyParam
+    ? assets.find((a) => a.code === currencyParam)
+    : assets.find((a) => a.code === "USDT");
   const [selectedAsset, setSelectedAsset] = React.useState<Asset | undefined>(
-    assets.find((a) => a.code === "USDT"),
+    initialAsset,
   );
   const [network, setNetwork] = React.useState<CryptoNetwork>("TRC20");
   const [address] = React.useState(() => generateWalletAddress("Ethereum"));

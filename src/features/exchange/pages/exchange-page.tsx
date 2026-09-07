@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowDown, RefreshCw } from "lucide-react";
 import { AppShell } from "@/shared/components/layout";
 import { Card, Button, Label } from "@/shared/components/ui";
@@ -25,11 +25,17 @@ const EXCHANGEABLE: CurrencyCode[] = ["USD", "NGN", "EUR", "GBP", "USDT", "USDC"
 
 export function ExchangePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { assets, exchange } = useAppStore();
 
   const [step, setStep] = React.useState<Step>("form");
-  const [from, setFrom] = React.useState<CurrencyCode>("USD");
-  const [to, setTo] = React.useState<CurrencyCode>("NGN");
+
+  // Pre-select "from" currency from query param if provided.
+  const currencyParam = searchParams.get("currency") as CurrencyCode | null;
+  const [from, setFrom] = React.useState<CurrencyCode>(currencyParam ?? "USD");
+  const [to, setTo] = React.useState<CurrencyCode>(
+    currencyParam === "NGN" ? "USD" : "NGN",
+  );
   const [amount, setAmount] = React.useState("");
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);

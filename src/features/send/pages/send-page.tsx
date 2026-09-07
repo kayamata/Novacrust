@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Banknote, Wallet } from "lucide-react";
 import { AppShell } from "@/shared/components/layout";
 import { Button, Card, Input, Label } from "@/shared/components/ui";
@@ -29,14 +29,19 @@ const NETWORKS: CryptoNetwork[] = ["TRC20", "ERC20", "BEP20", "Solana"];
 
 export function SendPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { assets, sendCrypto, sendMoney, recipients } = useAppStore();
 
   const [mode, setMode] = React.useState<Mode>("choose");
   const [step, setStep] = React.useState<Step>("form");
 
-  // Crypto form state
+  // Crypto form state — pre-select from query param if provided.
+  const currencyParam = searchParams.get("currency");
+  const initialAsset = currencyParam
+    ? assets.find((a) => a.code === currencyParam)
+    : assets.find((a) => a.code === "USDT");
   const [cryptoAsset, setCryptoAsset] = React.useState<Asset | undefined>(
-    assets.find((a) => a.code === "USDT"),
+    initialAsset,
   );
   const [cryptoAmount, setCryptoAmount] = React.useState("");
   const [recipientAddress, setRecipientAddress] = React.useState("");
