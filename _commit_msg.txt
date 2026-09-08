@@ -1,20 +1,16 @@
-feat: fiat-only balance carousel, send money account selection, profile fix
+fix: balance carousel order NGN→USD→GBP→Crypto, add CRYPTO currency code
 
-- Balance carousel now shows only NGN, GBP, USD with country flags
-  (removed USDT/USDC/BTC/ETH from the Home carousel)
-- Added GBP asset to mock data with proper balance and USD equivalent
-- Each balance slide displays the flag, currency code, account name,
-  and balance with the correct currency symbol
-- Send Money flow now has an account selection step before the recipient
-  form — user picks from NGN/GBP/USD, and the selected account drives
-  amounts, fees, exchange rates, and the sendMoney call
-- Send Crypto flow is unchanged
-- Replaced demo user name "Leonard Soempit" with "Alex Morgan" across
-  DEMO_USER, card holder, global accounts, bank account, and sign-up
-  placeholders
-- Fixed profile dropdown runtime error: DropdownMenuLabel now wrapped
-  in DropdownMenuGroup (Base UI requires MenuGroup context)
-- All components use semantic design tokens for light/dark mode
+- Reorder INITIAL_ASSETS to NGN, USD, GBP, then crypto assets
+- Dashboard carousel now shows: NGN → USD → GBP → combined Crypto
+  Balance as the last card
+- Combined crypto card sums all crypto asset USD values and displays
+  with a 🪙 glyph and "Crypto Balance" title
+- Crypto card action buttons navigate to Wallet/Send/Exchange instead
+  of deposit with an invalid currency
+- Added "CRYPTO" to CurrencyCode type, CURRENCY_SYMBOLS,
+  CURRENCY_LOCALES, USD_RATES, and exchange page symbol map
+- Send Money account selection order updated to NGN → USD → GBP
+- No "Leonard Soempit" references remain (verified)
 
 Generated with [Devin](https://devin.ai)
 

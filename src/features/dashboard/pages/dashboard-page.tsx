@@ -13,6 +13,7 @@ import { Card } from "@/shared/components/ui";
 import { useAppStore, useAuth } from "@/providers";
 import { ROUTES } from "@/utils/constants";
 import { getGreeting } from "@/utils/format";
+import type { Asset } from "@/shared/types";
 import { BalanceCarousel } from "@/features/dashboard/components/balance-carousel";
 import { QuickActions } from "@/features/dashboard/components/quick-actions";
 import { BalancesList } from "@/features/dashboard/components/balances-list";
@@ -30,10 +31,26 @@ export function DashboardPage() {
   const loading = !authHydrated || !storeHydrated;
   const firstName = user?.firstName ?? "there";
 
-  // Fiat accounts shown in the Home balance carousel (NGN → GBP → USD).
-  const carouselAssets = assets.filter((a) =>
-    ["NGN", "GBP", "USD"].includes(a.code),
-  );
+  // Carousel: NGN → USD → GBP → combined Crypto balance (last).
+  const fiatOrder: Asset["code"][] = ["NGN", "USD", "GBP"];
+  const fiatAssets = fiatOrder
+    .map((code) => assets.find((a) => a.code === code))
+    .filter((a): a is Asset => Boolean(a));
+  const cryptoAssets = assets.filter((a) => a.kind !== "cash");
+  const cryptoUsdTotal = cryptoAssets.reduce((sum, a) => sum + a.usdValue, 0);
+  const cryptoAsset: Asset = {
+    code: "CRYPTO",
+    name: "Crypto Balance",
+    kind: "crypto",
+    balance: cryptoUsdTotal,
+    usdValue: cryptoUsdTotal,
+    change24h: 0,
+    symbol: "$",
+    subtitle: "All crypto assets",
+    glyph: "🪙",
+    color: "bg-indigo-500",
+  };
+  const carouselAssets = [...fiatAssets, cryptoAsset];
 
   return (
     <AppShell>

@@ -29,7 +29,7 @@ type Step = "form" | "review" | "processing" | "success" | "error";
 const CRYPTO_ASSETS = ["USDT", "USDC", "BTC", "ETH"] as const;
 const NETWORKS: CryptoNetwork[] = ["TRC20", "ERC20", "BEP20", "Solana"];
 
-const FIAT_ACCOUNTS: CurrencyCode[] = ["NGN", "GBP", "USD"];
+const FIAT_ACCOUNTS: CurrencyCode[] = ["NGN", "USD", "GBP"];
 
 const CURRENCY_FLAGS: Partial<Record<CurrencyCode, string>> = {
   NGN: "🇳🇬",

@@ -14,7 +14,8 @@ export type CurrencyCode =
   | "USDC"
   | "BTC"
   | "ETH"
-  | "SOL";
+  | "SOL"
+  | "CRYPTO";
 
 export type AssetKind = "cash" | "crypto" | "stablecoin";
 

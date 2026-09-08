@@ -17,17 +17,6 @@ export const INITIAL_ASSETS: Asset[] = [
     color: "bg-amber-500",
   },
   {
-    code: "GBP",
-    name: "British Pound",
-    kind: "cash",
-    balance: 850,
-    usdValue: 1075.95,
-    change24h: 0.2,
-    symbol: "£",
-    subtitle: "GBP Account",
-    color: "bg-blue-700",
-  },
-  {
     code: "USD",
     name: "US Dollar",
     kind: "cash",
@@ -37,6 +26,17 @@ export const INITIAL_ASSETS: Asset[] = [
     symbol: "$",
     subtitle: "USD Account",
     color: "bg-emerald-600",
+  },
+  {
+    code: "GBP",
+    name: "British Pound",
+    kind: "cash",
+    balance: 850,
+    usdValue: 1075.95,
+    change24h: 0.2,
+    symbol: "£",
+    subtitle: "GBP Account",
+    color: "bg-blue-700",
   },
   {
     code: "USDT",
@@ -114,6 +114,7 @@ export const USD_RATES: Record<CurrencyCode, number> = {
   BTC: 0.00001046,
   ETH: 0.0004,
   SOL: 0.0066,
+  CRYPTO: 1,
 };
 
 /** Convert an amount from one currency to another using USD as the bridge. */

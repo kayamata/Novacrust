@@ -80,6 +80,8 @@ function BalanceSlide({
 }) {
   const symbol = currencySymbol(asset.code);
   const flag = CURRENCY_FLAGS[asset.code];
+  const isCryptoSummary = asset.code === "CRYPTO";
+  const title = isCryptoSummary ? "Crypto Balance" : `${asset.code} Account`;
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground sm:p-6">
@@ -94,15 +96,15 @@ function BalanceSlide({
               {flag}
             </span>
           ) : (
-            <div
-              className="flex size-7 items-center justify-center rounded-full bg-white/15 text-xs font-bold"
+            <span
+              className="text-2xl leading-none"
               aria-hidden
             >
               {asset.glyph ?? symbol}
-            </div>
+            </span>
           )}
           <div>
-            <p className="text-sm font-semibold leading-tight">{asset.code} Account</p>
+            <p className="text-sm font-semibold leading-tight">{title}</p>
             <p className="text-[0.7rem] leading-tight text-primary-foreground/70">
               {asset.name}
             </p>
@@ -118,7 +120,7 @@ function BalanceSlide({
           format={(n) => (hidden ? "••••••" : formatCurrency(n, asset.code))}
           className="mt-1 block text-3xl font-bold tracking-tight sm:text-4xl"
         />
-        {asset.code !== "USD" && (
+        {asset.code !== "USD" && !isCryptoSummary && (
           <p className="mt-1.5 text-sm text-primary-foreground/70">
             {hidden ? "≈ ••••••" : `≈ ${formatCurrency(usdEquivalent, "USD")}`}
           </p>
@@ -149,26 +151,45 @@ function BalanceSlide({
 /*  Action buttons row                                                         */
 /* -------------------------------------------------------------------------- */
 
-function ActionButtons({ currency }: { currency: CurrencyCode }) {
+function ActionButtons({ asset }: { asset: Asset }) {
   const router = useRouter();
+  const isCryptoSummary = asset.code === "CRYPTO";
 
-  const actions = [
-    {
-      label: "Add money",
-      icon: Plus,
-      href: `${ROUTES.deposit}?currency=${currency}`,
-    },
-    {
-      label: "Send",
-      icon: ArrowUpRight,
-      href: `${ROUTES.send}?currency=${currency}`,
-    },
-    {
-      label: "Convert",
-      icon: RefreshCw,
-      href: `${ROUTES.exchange}?currency=${currency}`,
-    },
-  ];
+  const actions = isCryptoSummary
+    ? [
+        {
+          label: "Wallet",
+          icon: Plus,
+          href: ROUTES.wallet,
+        },
+        {
+          label: "Send",
+          icon: ArrowUpRight,
+          href: ROUTES.send,
+        },
+        {
+          label: "Convert",
+          icon: RefreshCw,
+          href: ROUTES.exchange,
+        },
+      ]
+    : [
+        {
+          label: "Add money",
+          icon: Plus,
+          href: `${ROUTES.deposit}?currency=${asset.code}`,
+        },
+        {
+          label: "Send",
+          icon: ArrowUpRight,
+          href: `${ROUTES.send}?currency=${asset.code}`,
+        },
+        {
+          label: "Convert",
+          icon: RefreshCw,
+          href: `${ROUTES.exchange}?currency=${asset.code}`,
+        },
+      ];
 
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -333,7 +354,7 @@ export function BalanceCarousel({
       )}
 
       {/* Action buttons for the active slide */}
-      <ActionButtons currency={activeAsset.code} />
+      <ActionButtons asset={activeAsset} />
     </div>
   );
 }

@@ -16,6 +16,7 @@ const CURRENCY_SYMBOLS: Record<CurrencyCode, string> = {
   BTC: "₿",
   ETH: "Ξ",
   SOL: "◎",
+  CRYPTO: "$",
 };
 
 const CURRENCY_LOCALES: Record<CurrencyCode, string> = {
@@ -30,6 +31,7 @@ const CURRENCY_LOCALES: Record<CurrencyCode, string> = {
   BTC: "en-US",
   ETH: "en-US",
   SOL: "en-US",
+  CRYPTO: "en-US",
 };
 
 const CRYPTO_CURRENCIES: CurrencyCode[] = ["BTC", "ETH", "SOL", "USDT", "USDC"];

@@ -244,7 +244,7 @@ export function ExchangePage() {
 function currencySymbol(code: CurrencyCode): string {
   const map: Record<CurrencyCode, string> = {
     USD: "$", NGN: "₦", EUR: "€", GBP: "£", GHS: "₵", KES: "KSh",
-    USDT: "$", USDC: "$", BTC: "₿", ETH: "Ξ", SOL: "◎",
+    USDT: "$", USDC: "$", BTC: "₿", ETH: "Ξ", SOL: "◎", CRYPTO: "$",
   };
   return map[code] ?? "";
 }
