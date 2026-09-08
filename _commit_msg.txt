@@ -1,8 +1,14 @@
-chore: change demo user name to Jordan Carter
+fix: clear stale auth user from localStorage so new name appears
 
-Replace Alex Morgan with Jordan Carter across all mock data:
-DEMO_USER, card holder, global accounts, bank account, and sign-up
-form placeholders. Bumped DATA_VERSION to v3 to re-seed localStorage.
+The auth provider persisted the old "Leonard Soempit" user under
+STORAGE_KEYS.auth (separate from the app store). The DATA_VERSION check
+was only in the app store provider, so the stale user remained.
+
+- Added DATA_VERSION check to AuthProvider hydration: clears
+  STORAGE_KEYS.auth when the version changes so the updated
+  DEMO_USER is used on the next sign-in
+- Bumped DATA_VERSION to v4
+- Demo user name is now "Jordan Carter" everywhere
 
 Generated with [Devin](https://devin.ai)
 

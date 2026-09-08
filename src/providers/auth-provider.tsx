@@ -3,7 +3,7 @@
 import * as React from "react";
 import type { UserProfile } from "@/shared/types";
 import { DEMO_USER } from "@/shared/data";
-import { STORAGE_KEYS, DEMO_CREDENTIALS } from "@/utils/constants";
+import { STORAGE_KEYS, DEMO_CREDENTIALS, DATA_VERSION } from "@/utils/constants";
 
 /* -------------------------------------------------------------------------- */
 /*  Auth state — frontend-only, persisted to localStorage.                     */
@@ -63,6 +63,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Hydrate from localStorage on mount (SSR-safe: localStorage is only
   // available in the browser, so this must run in an effect, not lazily).
   React.useEffect(() => {
+    // If the data version changed, clear the stale persisted user so the
+    // updated DEMO_USER is used on the next sign-in.
+    if (typeof window !== "undefined") {
+      const storedVersion = window.localStorage.getItem(STORAGE_KEYS.dataVersion);
+      if (storedVersion !== DATA_VERSION) {
+        window.localStorage.removeItem(STORAGE_KEYS.auth);
+        window.localStorage.setItem(STORAGE_KEYS.dataVersion, DATA_VERSION);
+      }
+    }
     const user = loadUser();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({
