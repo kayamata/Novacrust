@@ -1,17 +1,16 @@
-fix: balance carousel order NGN→USD→GBP→Crypto, add CRYPTO currency code
+fix: force localStorage re-seed so GBP account appears
 
-- Reorder INITIAL_ASSETS to NGN, USD, GBP, then crypto assets
-- Dashboard carousel now shows: NGN → USD → GBP → combined Crypto
-  Balance as the last card
-- Combined crypto card sums all crypto asset USD values and displays
-  with a 🪙 glyph and "Crypto Balance" title
-- Crypto card action buttons navigate to Wallet/Send/Exchange instead
-  of deposit with an invalid currency
-- Added "CRYPTO" to CurrencyCode type, CURRENCY_SYMBOLS,
-  CURRENCY_LOCALES, USD_RATES, and exchange page symbol map
-- Send Money account selection order updated to NGN → USD → GBP
-- No "Leonard Soempit" references remain (verified)
+The app hydrates assets from localStorage on mount. Previous sessions
+persisted the old INITIAL_ASSETS (without GBP), so the GBP card never
+appeared even though the code was correct.
+
+- Added DATA_VERSION constant ("v2") and nc_data_version storage key
+- On hydration, if the stored version doesn't match, all mock data is
+  re-seeded from defaults (INITIAL_ASSETS, DEMO_USER, etc.)
+- resetToDefaults also saves the current data version
+- This ensures the GBP account, updated user name, and reordered assets
+  appear for existing users with stale localStorage
 
 Generated with [Devin](https://devin.ai)
 
-Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com

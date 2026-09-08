@@ -23,7 +23,7 @@ import {
   INITIAL_NOTIFICATIONS,
   DEMO_USER,
 } from "@/shared/data";
-import { STORAGE_KEYS } from "@/utils/constants";
+import { STORAGE_KEYS, DATA_VERSION } from "@/utils/constants";
 import { generateId, generateReference } from "@/utils/format";
 import { convertCurrency, USD_RATES } from "@/shared/data/assets";
 
@@ -192,12 +192,27 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   // Hydrate from localStorage on mount.
   React.useEffect(() => {
-    const assets = loadState(STORAGE_KEYS.balances, INITIAL_ASSETS);
-    const transactions = loadState(STORAGE_KEYS.transactions, INITIAL_TRANSACTIONS);
-    const cards = loadState(STORAGE_KEYS.cards, INITIAL_CARDS);
-    const recipients = loadState(STORAGE_KEYS.recipients, INITIAL_RECIPIENTS);
-    const notifications = loadState(STORAGE_KEYS.notifications, INITIAL_NOTIFICATIONS);
-    const user = loadState(STORAGE_KEYS.user, DEMO_USER);
+    // Check data version — if it changed, re-seed all mock data.
+    const storedVersion = loadState<string>(STORAGE_KEYS.dataVersion, "");
+    const isStale = storedVersion !== DATA_VERSION;
+
+    const assets = isStale ? INITIAL_ASSETS : loadState(STORAGE_KEYS.balances, INITIAL_ASSETS);
+    const transactions = isStale
+      ? INITIAL_TRANSACTIONS
+      : loadState(STORAGE_KEYS.transactions, INITIAL_TRANSACTIONS);
+    const cards = isStale ? INITIAL_CARDS : loadState(STORAGE_KEYS.cards, INITIAL_CARDS);
+    const recipients = isStale
+      ? INITIAL_RECIPIENTS
+      : loadState(STORAGE_KEYS.recipients, INITIAL_RECIPIENTS);
+    const notifications = isStale
+      ? INITIAL_NOTIFICATIONS
+      : loadState(STORAGE_KEYS.notifications, INITIAL_NOTIFICATIONS);
+    const user = isStale ? DEMO_USER : loadState(STORAGE_KEYS.user, DEMO_USER);
+
+    if (isStale) {
+      saveState(STORAGE_KEYS.dataVersion, DATA_VERSION);
+    }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({
       assets,
@@ -660,6 +675,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   /* ---------------------------------------------------------------------- */
 
   const resetToDefaults = React.useCallback(() => {
+    saveState(STORAGE_KEYS.dataVersion, DATA_VERSION);
     setState({
       assets: INITIAL_ASSETS,
       transactions: INITIAL_TRANSACTIONS,
