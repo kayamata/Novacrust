@@ -82,7 +82,7 @@ export function SignUpForm() {
           <Label htmlFor="signup-firstname">First name</Label>
           <Input
             id="signup-firstname"
-            placeholder="Alex"
+            placeholder="Jordan"
             value={form.firstName}
             onChange={(e) => update("firstName", e.target.value)}
             disabled={loading}
@@ -93,7 +93,7 @@ export function SignUpForm() {
           <Label htmlFor="signup-lastname">Last name</Label>
           <Input
             id="signup-lastname"
-            placeholder="Morgan"
+            placeholder="Carter"
             value={form.lastName}
             onChange={(e) => update("lastName", e.target.value)}
             disabled={loading}

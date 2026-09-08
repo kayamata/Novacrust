@@ -46,7 +46,7 @@ export const STORAGE_KEYS = {
  * Bump this when the shape of INITIAL_ASSETS / DEMO_USER changes so the
  * app store re-seeds from defaults instead of using stale localStorage.
  */
-export const DATA_VERSION = "v2";
+export const DATA_VERSION = "v3";
 
 export const DEMO_CREDENTIALS = {
   email: "demo@novacrust.com",

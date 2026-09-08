@@ -18,7 +18,7 @@ export const INITIAL_CARDS: VirtualCard[] = [
     maskedNumber: "•••• 4829",
     expiry: "09/29",
     cvv: "284",
-    holder: "ALEX MORGAN",
+    holder: "JORDAN CARTER",
     balance: 2450,
     currency: "USD",
     status: "active",
@@ -165,8 +165,8 @@ export const GIFT_CARDS: GiftCard[] = [
 
 export const DEMO_USER: UserProfile = {
   id: "user_demo_001",
-  firstName: "Alex",
-  lastName: "Morgan",
+  firstName: "Jordan",
+  lastName: "Carter",
   email: "demo@novacrust.com",
   phone: "+234 803 123 4567",
   country: "Nigeria",
@@ -261,7 +261,7 @@ export const GLOBAL_ACCOUNTS = [
   {
     currency: "USD" as const,
     status: "active" as const,
-    accountName: "Alex Morgan",
+    accountName: "Jordan Carter",
     accountNumber: "004829182",
     routingNumber: "021000021",
     bank: "Novacrust Partner Bank",
@@ -270,7 +270,7 @@ export const GLOBAL_ACCOUNTS = [
   {
     currency: "EUR" as const,
     status: "coming_soon" as const,
-    accountName: "Alex Morgan",
+    accountName: "Jordan Carter",
     accountNumber: "—",
     routingNumber: "—",
     bank: "Novacrust Partner Bank",
@@ -279,7 +279,7 @@ export const GLOBAL_ACCOUNTS = [
   {
     currency: "GBP" as const,
     status: "coming_soon" as const,
-    accountName: "Alex Morgan",
+    accountName: "Jordan Carter",
     accountNumber: "—",
     routingNumber: "—",
     bank: "Novacrust Partner Bank",
@@ -292,7 +292,7 @@ export const GLOBAL_ACCOUNTS = [
 /* -------------------------------------------------------------------------- */
 
 export const MOCK_BANK_ACCOUNT = {
-  accountName: "Alex Morgan",
+  accountName: "Jordan Carter",
   accountNumber: "004829182",
   routingNumber: "021000021",
   bank: "Novacrust Partner Bank",
