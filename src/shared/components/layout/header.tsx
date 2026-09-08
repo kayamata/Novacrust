@@ -8,6 +8,7 @@ import { Button } from "@/shared/components/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -107,38 +108,40 @@ export function Header({ title }: { title: string }) {
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">{fullName}</span>
-                  <span className="truncate text-xs font-normal text-muted-foreground">
-                    {user?.email ?? "guest@novacrust.com"}
-                  </span>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push(ROUTES.settings)}>
-                <User className="size-4" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(ROUTES.settings)}>
-                <SettingsIcon className="size-4" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(ROUTES.support)}>
-                <HelpCircle className="size-4" />
-                Help & support
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => {
-                  signOut();
-                  router.push(ROUTES.signin);
-                }}
-                className="text-destructive focus:text-destructive"
-              >
-                <LogOut className="size-4" />
-                Log out
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground">{fullName}</span>
+                    <span className="truncate text-xs font-normal text-muted-foreground">
+                      {user?.email ?? "guest@novacrust.com"}
+                    </span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push(ROUTES.settings)}>
+                  <User className="size-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push(ROUTES.settings)}>
+                  <SettingsIcon className="size-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push(ROUTES.support)}>
+                  <HelpCircle className="size-4" />
+                  Help & support
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    signOut();
+                    router.push(ROUTES.signin);
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <LogOut className="size-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

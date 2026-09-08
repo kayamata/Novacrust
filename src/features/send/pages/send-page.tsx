@@ -16,16 +16,26 @@ import {
 } from "@/shared/components/common";
 import { useAppStore } from "@/providers";
 import { ROUTES } from "@/utils/constants";
-import { formatCurrency, truncateAddress } from "@/utils/format";
+import { formatCurrency, truncateAddress, currencySymbol } from "@/utils/format";
 import { hasSufficientBalance, isValidWalletAddress } from "@/utils/validate";
+import { USD_RATES } from "@/shared/data";
 import { cn } from "@/utils/cn";
 import type { Asset, CryptoNetwork, CurrencyCode, Transaction } from "@/shared/types";
 
 type Mode = "choose" | "crypto" | "money";
+type MoneyStep = "account" | "form" | "review";
 type Step = "form" | "review" | "processing" | "success" | "error";
 
 const CRYPTO_ASSETS = ["USDT", "USDC", "BTC", "ETH"] as const;
 const NETWORKS: CryptoNetwork[] = ["TRC20", "ERC20", "BEP20", "Solana"];
+
+const FIAT_ACCOUNTS: CurrencyCode[] = ["NGN", "GBP", "USD"];
+
+const CURRENCY_FLAGS: Partial<Record<CurrencyCode, string>> = {
+  NGN: "🇳🇬",
+  GBP: "🇬🇧",
+  USD: "🇺🇸",
+};
 
 export function SendPage() {
   const router = useRouter();
@@ -48,7 +58,11 @@ export function SendPage() {
   const [network, setNetwork] = React.useState<CryptoNetwork>("TRC20");
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
-  // Money form state
+  // Money form state — selected fiat account + recipient details.
+  const [moneyStep, setMoneyStep] = React.useState<MoneyStep>("account");
+  const [moneyAccount, setMoneyAccount] = React.useState<Asset | undefined>(
+    assets.find((a) => a.code === "USD"),
+  );
   const [moneyAmount, setMoneyAmount] = React.useState("");
   const [recipientName, setRecipientName] = React.useState("");
   const [bank, setBank] = React.useState("");
@@ -96,23 +110,25 @@ export function SendPage() {
   /*  Money send                                                        */
   /* ------------------------------------------------------------------ */
 
-  const usdAsset = assets.find((a) => a.code === "USD");
   const moneyAmountNum = parseFloat(moneyAmount) || 0;
   const fee = 2.5;
   const total = moneyAmountNum + fee;
-  const rate = 1470; // USD → NGN
+  // Convert from the selected fiat account to NGN for display.
+  const fromCode = moneyAccount?.code ?? "USD";
+  const rate = fromCode === "NGN" ? 1 : USD_RATES.NGN / (USD_RATES[fromCode] ?? 1);
   const receiveAmount = moneyAmountNum * rate;
 
   function validateMoney(): string | null {
+    if (!moneyAccount) return "Please choose an account.";
     if (!moneyAmountNum || moneyAmountNum <= 0) return "Please enter a valid amount.";
-    if (!usdAsset || total > usdAsset.balance) return "Insufficient USD balance.";
+    if (total > moneyAccount.balance) return `Insufficient ${fromCode} balance.`;
     if (!selectedRecipientId && (!recipientName.trim() || !accountNumber.trim() || !bank.trim()))
       return "Please enter the recipient's details.";
     return null;
   }
 
   async function confirmSendMoney() {
-    if (!usdAsset) return;
+    if (!moneyAccount) return;
     const recipient = selectedRecipientId
       ? recipients.find((r) => r.id === selectedRecipientId)!
       : {
@@ -131,7 +147,7 @@ export function SendPage() {
     setError(null);
     try {
       const tx = await sendMoney({
-        fromCurrency: "USD",
+        fromCurrency: fromCode,
         amount: moneyAmountNum,
         recipient,
       });
@@ -206,7 +222,20 @@ export function SendPage() {
         {/* Back */}
         <button
           type="button"
-          onClick={() => (mode === "choose" ? router.back() : setMode("choose"))}
+          onClick={() => {
+            if (mode === "choose") {
+              router.back();
+            } else if (mode === "money" && moneyStep === "account") {
+              setMode("choose");
+            } else if (mode === "money" && moneyStep === "form") {
+              setMoneyStep("account");
+            } else if (mode === "money" && moneyStep === "review") {
+              setMoneyStep("form");
+              setStep("form");
+            } else {
+              setMode("choose");
+            }
+          }}
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
@@ -236,7 +265,10 @@ export function SendPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setMode("money")}
+                onClick={() => {
+                  setMode("money");
+                  setMoneyStep("account");
+                }}
                 className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-sm"
               >
                 <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -402,13 +434,96 @@ export function SendPage() {
           </div>
         )}
 
+        {/* Money — account selection */}
+        {mode === "money" && moneyStep === "account" && (
+          <div className="space-y-5 nc-animate-fade-in">
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Send money</h2>
+              <p className="text-sm text-muted-foreground">Choose an account to send from</p>
+            </div>
+            <div className="space-y-3">
+              {FIAT_ACCOUNTS.map((code) => {
+                const a = assets.find((x) => x.code === code);
+                if (!a) return null;
+                const flag = CURRENCY_FLAGS[code];
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => {
+                      setMoneyAccount(a);
+                      setMoneyStep("form");
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-xl border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-sm",
+                      moneyAccount?.code === code
+                        ? "border-primary bg-primary/5"
+                        : "border-border",
+                    )}
+                  >
+                    {flag ? (
+                      <span className="text-2xl leading-none" aria-hidden>
+                        {flag}
+                      </span>
+                    ) : (
+                      <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {currencySymbol(code)}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{code} Account</p>
+                      <p className="text-xs text-muted-foreground">{a.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatCurrency(a.balance, code)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">available</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Money form */}
-        {mode === "money" && step === "form" && (
+        {mode === "money" && moneyStep === "form" && (
           <div className="space-y-5 nc-animate-fade-in">
             <div className="space-y-1">
               <h2 className="text-xl font-bold tracking-tight text-foreground">Send money</h2>
               <p className="text-sm text-muted-foreground">Who are you sending to?</p>
             </div>
+
+            {/* Selected account badge */}
+            {moneyAccount && (
+              <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/40 p-3">
+                {CURRENCY_FLAGS[moneyAccount.code] ? (
+                  <span className="text-xl leading-none" aria-hidden>
+                    {CURRENCY_FLAGS[moneyAccount.code]}
+                  </span>
+                ) : (
+                  <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                    {currencySymbol(moneyAccount.code)}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    {moneyAccount.code} Account
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatCurrency(moneyAccount.balance, moneyAccount.code)} available
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMoneyStep("account")}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Change
+                </button>
+              </div>
+            )}
 
             {/* Saved recipients */}
             {recipients.filter((r) => r.accountNumber).length > 0 && (
@@ -502,18 +617,20 @@ export function SendPage() {
 
             {/* Amount */}
             <div className="space-y-1.5">
-              <Label>Amount (USD)</Label>
+              <Label>Amount ({fromCode})</Label>
               <AmountInput
                 value={moneyAmount}
                 onChange={setMoneyAmount}
-                symbol="$"
+                symbol={currencySymbol(fromCode)}
                 placeholder="0.00"
-                max={usdAsset?.balance.toFixed(2)}
-                onMax={() => usdAsset && setMoneyAmount((usdAsset.balance - fee).toFixed(2))}
+                max={moneyAccount?.balance.toFixed(2)}
+                onMax={() =>
+                  moneyAccount && setMoneyAmount((moneyAccount.balance - fee).toFixed(2))
+                }
               />
-              {usdAsset && (
+              {moneyAccount && (
                 <p className="text-xs text-muted-foreground">
-                  Available: {formatCurrency(usdAsset.balance, "USD")}
+                  Available: {formatCurrency(moneyAccount.balance, fromCode)}
                 </p>
               )}
             </div>
@@ -522,9 +639,12 @@ export function SendPage() {
             {moneyAmountNum > 0 && (
               <Card className="p-4">
                 <ReviewRow label="Recipient receives" value={`₦${receiveAmount.toLocaleString()}`} emphasize />
-                <ReviewRow label="Exchange rate" value="1 USD = ₦1,470" />
-                <ReviewRow label="Fee" value={formatCurrency(fee, "USD")} />
-                <ReviewRow label="Total" value={formatCurrency(total, "USD")} emphasize />
+                <ReviewRow
+                  label="Exchange rate"
+                  value={`1 ${fromCode} = ₦${rate.toLocaleString()}`}
+                />
+                <ReviewRow label="Fee" value={formatCurrency(fee, fromCode)} />
+                <ReviewRow label="Total" value={formatCurrency(total, fromCode)} emphasize />
               </Card>
             )}
 
@@ -539,6 +659,7 @@ export function SendPage() {
                   return;
                 }
                 setError(null);
+                setMoneyStep("review");
                 setStep("review");
               }}
             >
@@ -548,20 +669,24 @@ export function SendPage() {
         )}
 
         {/* Money review */}
-        {mode === "money" && step === "review" && (
+        {mode === "money" && moneyStep === "review" && (
           <div className="space-y-5 nc-animate-fade-in">
             <div className="space-y-1">
               <h2 className="text-xl font-bold tracking-tight text-foreground">Review transfer</h2>
               <p className="text-sm text-muted-foreground">Check the details before confirming.</p>
             </div>
             <Card className="p-4">
+              <ReviewRow label="From" value={`${fromCode} Account`} />
               <ReviewRow label="Recipient" value={recipientName} />
               <ReviewRow label="Bank" value={bank} />
               <ReviewRow label="Account number" value={accountNumber} />
               <div className="my-3 border-t border-border" />
-              <ReviewRow label="You send" value={formatCurrency(total, "USD")} emphasize />
-              <ReviewRow label="Exchange rate" value="1 USD = ₦1,470" />
-              <ReviewRow label="Fee" value={formatCurrency(fee, "USD")} />
+              <ReviewRow label="You send" value={formatCurrency(total, fromCode)} emphasize />
+              <ReviewRow
+                label="Exchange rate"
+                value={`1 ${fromCode} = ₦${rate.toLocaleString()}`}
+              />
+              <ReviewRow label="Fee" value={formatCurrency(fee, fromCode)} />
               <ReviewRow
                 label="Recipient receives"
                 value={`₦${receiveAmount.toLocaleString()}`}
@@ -569,7 +694,14 @@ export function SendPage() {
               />
             </Card>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => setStep("form")}>
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setMoneyStep("form");
+                  setStep("form");
+                }}
+              >
                 Back
               </Button>
               <Button className="flex-1" onClick={() => setConfirmOpen(true)}>
@@ -580,7 +712,7 @@ export function SendPage() {
               open={confirmOpen}
               onOpenChange={setConfirmOpen}
               title="Confirm transfer?"
-              description={`${formatCurrency(total, "USD")} will be sent to ${recipientName}.`}
+              description={`${formatCurrency(total, fromCode)} will be sent to ${recipientName}.`}
               confirmLabel="Confirm"
               onConfirm={confirmSendMoney}
             />

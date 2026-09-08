@@ -1,24 +1,20 @@
-feat: replace dashboard card with swipeable balance carousel
+feat: fiat-only balance carousel, send money account selection, profile fix
 
-Remove the virtual card widget from the Home/Dashboard (it remains on
-the dedicated Cards page). Transform the balance section into a
-horizontal carousel that cycles through all existing asset balances.
-
-- New BalanceCarousel component with CSS scroll-snap for natural
-  touch swiping on mobile and mouse/trackpad drag on desktop
-- Each slide shows currency code, name, symbol/glyph, balance
-  (animated), USD equivalent, and a subtle trend line
-- Pagination dots underneath with smooth active-state animation
-- Left/right arrow controls on desktop (sm+ screens)
-- Action buttons (Add money, Send, Convert) on each slide navigate
-  with ?currency= query param so the target page pre-selects that
-  currency
-- Send, Deposit, and Exchange pages now read useSearchParams to
-  pre-select the currency from the carousel action
-- Route files wrapped in Suspense for useSearchParams compatibility
-- Layout rebalanced: greeting → carousel → quick actions →
-  balances + recent activity
-- All semantic design tokens preserved for light/dark mode
+- Balance carousel now shows only NGN, GBP, USD with country flags
+  (removed USDT/USDC/BTC/ETH from the Home carousel)
+- Added GBP asset to mock data with proper balance and USD equivalent
+- Each balance slide displays the flag, currency code, account name,
+  and balance with the correct currency symbol
+- Send Money flow now has an account selection step before the recipient
+  form — user picks from NGN/GBP/USD, and the selected account drives
+  amounts, fees, exchange rates, and the sendMoney call
+- Send Crypto flow is unchanged
+- Replaced demo user name "Leonard Soempit" with "Alex Morgan" across
+  DEMO_USER, card holder, global accounts, bank account, and sign-up
+  placeholders
+- Fixed profile dropdown runtime error: DropdownMenuLabel now wrapped
+  in DropdownMenuGroup (Base UI requires MenuGroup context)
+- All components use semantic design tokens for light/dark mode
 
 Generated with [Devin](https://devin.ai)
 

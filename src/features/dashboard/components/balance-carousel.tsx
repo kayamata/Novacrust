@@ -9,6 +9,19 @@ import { ROUTES } from "@/utils/constants";
 import type { Asset, CurrencyCode } from "@/shared/types";
 
 /* -------------------------------------------------------------------------- */
+/*  Currency flags                                                             */
+/* -------------------------------------------------------------------------- */
+
+const CURRENCY_FLAGS: Partial<Record<CurrencyCode, string>> = {
+  NGN: "🇳🇬",
+  GBP: "🇬🇧",
+  USD: "🇺🇸",
+  EUR: "🇪🇺",
+  GHS: "🇬🇭",
+  KES: "🇰🇪",
+};
+
+/* -------------------------------------------------------------------------- */
 /*  Animated number — smoothly transitions between values                      */
 /* -------------------------------------------------------------------------- */
 
@@ -66,22 +79,30 @@ function BalanceSlide({
   usdEquivalent: number;
 }) {
   const symbol = currencySymbol(asset.code);
+  const flag = CURRENCY_FLAGS[asset.code];
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground sm:p-6">
-      {/* Header row */}
+      {/* Header row — flag + account name */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "flex size-7 items-center justify-center rounded-full bg-white/15 text-xs font-bold",
-            )}
-            aria-hidden
-          >
-            {asset.glyph ?? symbol}
-          </div>
+        <div className="flex items-center gap-2.5">
+          {flag ? (
+            <span
+              className="text-2xl leading-none drop-shadow-sm"
+              aria-hidden
+            >
+              {flag}
+            </span>
+          ) : (
+            <div
+              className="flex size-7 items-center justify-center rounded-full bg-white/15 text-xs font-bold"
+              aria-hidden
+            >
+              {asset.glyph ?? symbol}
+            </div>
+          )}
           <div>
-            <p className="text-sm font-semibold leading-tight">{asset.code}</p>
+            <p className="text-sm font-semibold leading-tight">{asset.code} Account</p>
             <p className="text-[0.7rem] leading-tight text-primary-foreground/70">
               {asset.name}
             </p>

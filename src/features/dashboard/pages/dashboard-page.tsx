@@ -30,6 +30,11 @@ export function DashboardPage() {
   const loading = !authHydrated || !storeHydrated;
   const firstName = user?.firstName ?? "there";
 
+  // Fiat accounts shown in the Home balance carousel (NGN → GBP → USD).
+  const carouselAssets = assets.filter((a) =>
+    ["NGN", "GBP", "USD"].includes(a.code),
+  );
+
   return (
     <AppShell>
       <div className="space-y-6">
@@ -43,9 +48,9 @@ export function DashboardPage() {
           </p>
         </div>
 
-        {/* Balance carousel — main visual focus */}
+        {/* Balance carousel — main visual focus (fiat accounts only) */}
         <div className="nc-animate-fade-in">
-          <BalanceCarousel assets={assets} loading={loading} />
+          <BalanceCarousel assets={carouselAssets} loading={loading} />
         </div>
 
         {/* Quick actions */}
